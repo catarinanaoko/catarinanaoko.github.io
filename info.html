@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>catarina naoko</title>
+  <style>
+    :root {
+      --yellow: #FFB6C1;
+      --ink: #171717;
+      --page-gutter: clamp(18px, 3vw, 48px);
+    }
+
+    * {
+      box-sizing: border-box;
+      cursor: url("cookie-cursor.svg") 4 4, auto;
+    }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--yellow);
+      color: var(--ink);
+      font-family: Times New Roman, Helvetica, sans-serif;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .video-background {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      background: var(--yellow);
+    }
+
+    .video-background video {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .site-header {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      padding: 24px var(--page-gutter) 0;
+      font-size: 17px;
+      line-height: 1;
+    }
+
+    .site-name { text-decoration: none; color: inherit; }
+    .page-label { text-align: center; }
+
+    .info-toggle {
+      padding: 0;
+      border: 0;
+      background: none;
+      color: inherit;
+      font: inherit;
+      cursor: url("cookie-cursor.svg") 4 4, pointer;
+    }
+
+    .info-panel {
+      position: fixed;
+      top: 48px;
+      right: var(--page-gutter);
+      z-index: 2;
+      display: none;
+      max-width: min(360px, calc(100vw - 36px));
+      font-size: 14px;
+      line-height: 1.45;
+      text-align: right;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-weight: 500;
+    }
+
+    .info-portrait {
+      display: block;
+      width: 180px;
+      height: auto;
+      margin: 0 0 16px auto;
+    }
+
+    .info-panel.open { display: block; }
+    .info-panel p { margin: 0 0 12px; }
+    .info-panel a { color: inherit; text-decoration: none; }
+    .info-panel a:hover { text-decoration: underline; }
+
+    main {
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      width: min(100% - 36px, 1000px);
+      margin: 8px auto 0;
+      padding-bottom: clamp(72px, 12vh, 130px);
+      font-family: Helvetica, Arial, sans-serif;
+    }
+
+    .content {
+      width: min(100%, 490px);
+      margin: 0 auto;
+    }
+
+    .details {
+      margin-top: 36px;
+      font-size: 16px;
+      line-height: 1.25;
+    }
+
+    .details strong { font-weight: 700; }
+
+    .details a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .details a:hover { text-decoration: underline; }
+
+    .language {
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      bottom: 18px;
+      padding-left: 0;
+      font-size: clamp(16px, 1.5vw, 23px);
+      white-space: nowrap;
+    }
+
+    .index-link {
+      margin-top: 10px;
+      font-size: clamp(20px, 2vw, 28px);
+    }
+
+    @media (max-width: 700px) {
+      .site-header {
+        grid-template-columns: 1fr auto;
+        padding-top: 20px;
+      }
+
+      .page-label { text-align: right; }
+
+      main {
+        width: min(100% - 90px, 490px);
+        margin-top: 26px;
+        padding-bottom: clamp(40px, 8vh, 72px);
+      }
+
+      .content { width: 100%; }
+      .details { margin-top: 24px; margin-bottom: 24px; }
+      .language {
+        position: relative;
+        padding: 0 18px 18px;
+        font-size: 30px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="video-background" aria-hidden="true">
+    <video autoplay muted loop playsinline>
+      <source src="c-1.mp4" type="video/mp4" />
+    </video>
+  </div>
+
+  <header class="site-header">
+    <a class="site-name" href="#">catarinanaoko.com</a>
+    <button class="page-label info-toggle" type="button" aria-expanded="false" aria-controls="info-panel">info</button>
+  </header>
+
+  <aside class="info-panel" id="info-panel" aria-hidden="true">
+    <img class="info-portrait" src="images/portrait.jpg" alt="Portrait of Catarina Naoko" />
+    <p>In a lucky draw, Catarina Naoko is interested in the moment of breaking a fortune cookie - the anticipation and the message, the intimacy of two fingers and a prophecy.</p>
+    <p>Taking vulnerability at its core, her works combines narrative with graphic, editorial, and digital design.</p>
+    <p>Much like a fortune cookie - it is a nod to the magic of everyday life, showing how even a simple phrase can connect people.</p>
+
+  </aside>
+
+  <main>
+    <section class="content">
+      <div class="details">
+        <strong>catarina naoko</strong><br />
+       <br /><br />
+        <a href="mailto:catarinanaoko@gmail.com">catarinanaoko@gmail.com ↗</a><br />
+        <a href="https://instagram.com/catarinanaoko" target="_blank" rel="noreferrer">instagram ↗</a>
+        <div class="index-link"><a href="index.html">projects</a></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const infoToggle = document.querySelector(".info-toggle");
+    const infoPanel = document.getElementById("info-panel");
+
+    function setInfoPanelOpen(isOpen) {
+      infoPanel.classList.toggle("open", isOpen);
+      infoToggle.setAttribute("aria-expanded", String(isOpen));
+      infoPanel.setAttribute("aria-hidden", String(!isOpen));
+    }
+
+    infoToggle.addEventListener("click", () => {
+      setInfoPanelOpen(infoToggle.getAttribute("aria-expanded") !== "true");
+    });
+
+    document.addEventListener("click", (event) => {
+      if (!infoPanel.contains(event.target) && !infoToggle.contains(event.target)) {
+        setInfoPanelOpen(false);
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        setInfoPanelOpen(false);
+      }
+    });
+  </script>
+
+</body>
+</html>

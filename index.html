@@ -1,0 +1,755 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>catarina naoko archive</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    cursor: url("cookie-cursor.svg") 4 4, auto;
+}
+
+body {
+    background: #FFDFE9;
+    color: #000;
+    font-family: Times New Roman, Helvetica, sans-serif;
+    font-size: 40px;
+}
+
+/* HEADER */
+
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 18px 16px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 17px;
+    z-index: 10;
+}
+
+.header a,
+.header .info-toggle {
+    color: black;
+    text-decoration: none;
+}
+
+.header .info-toggle {
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    cursor: url("cookie-cursor.svg") 4 4, pointer;
+}
+
+.info-panel {
+    position: fixed;
+    top: 48px;
+    right: 16px;
+    z-index: 11;
+    display: none;
+    max-width: min(280px, calc(100vw - 32px));
+    font-size: 12px;
+    line-height: 1.4;
+    text-align: right;
+}
+
+.info-panel.open {
+    display: block;
+}
+
+.info-panel a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.info-panel a:hover {
+    text-decoration: underline;
+}
+
+/* PROJECT LIST */
+
+.projects {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 140px 9% 60px;
+}
+
+.project {
+    display: grid;
+    grid-template-columns: 22% 48% 20% 10%;
+    line-height: 19px;
+}
+
+.project span {
+    white-space: nowrap;
+}
+
+.project-name,
+.project-info {
+    cursor: url("cookie-cursor.svg") 4 4, pointer;
+    transition: opacity 0.2s;
+}
+
+.project-name:hover,
+.project-info:hover {
+    opacity: 0.4;
+}
+
+/* IMAGE VIEWER */
+
+#image-viewer {
+    position: fixed;
+    inset: 0;
+    background: #FFDFE9;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 64px clamp(24px, 7vw, 100px);
+    z-index: 20;
+    cursor: url("cookie-cursor.svg") 4 4, pointer;
+}
+
+#image-viewer.active {
+    display: flex;
+}
+
+.viewer-content {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(240px, 0.75fr);
+    align-items: center;
+    gap: clamp(24px, 5vw, 72px);
+    width: min(1200px, 100%);
+    max-height: 82vh;
+    cursor: url("cookie-cursor.svg") 4 4, auto;
+}
+
+.viewer-content.centered-preview {
+    grid-template-columns: minmax(0, 1fr);
+    overflow-y: auto;
+}
+
+.centered-preview .preview-link,
+.centered-preview .viewer-copy {
+    width: min(100%, 700px);
+    margin-inline: auto;
+}
+
+#preview {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    max-height: 82vh;
+    object-fit: contain;
+    animation: appear 0.4s ease;
+    cursor: url("cookie-cursor.svg") 4 4, auto;
+}
+
+#preview-link[hidden],
+#flipbook[hidden],
+#page-turn[hidden] {
+    display: none;
+}
+
+.preview-link {
+    display: block;
+    width: 100%;
+    max-height: 82vh;
+}
+
+#preview-link[href] #preview {
+    cursor: url("cookie-cursor.svg") 4 4, pointer;
+}
+
+.flipbook {
+    position: relative;
+    width: min(100%, 53vh);
+    aspect-ratio: 419 / 595;
+    margin-inline: auto;
+    background: #fff;
+    box-shadow: 0 12px 36px rgb(0 0 0 / 18%);
+    perspective: 1800px;
+    user-select: none;
+}
+
+.flipbook-page,
+.page-turn,
+.page-turn img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.flipbook-page,
+.page-turn img {
+    object-fit: contain;
+    background: #fff;
+}
+
+.page-turn {
+    z-index: 2;
+    transform-style: preserve-3d;
+    pointer-events: none;
+}
+
+.page-turn.turn-next {
+    transform-origin: left center;
+    animation: turn-next 0.65s cubic-bezier(0.2, 0.72, 0.25, 1) forwards;
+}
+
+.page-turn.turn-previous {
+    transform-origin: right center;
+    animation: turn-previous 0.65s cubic-bezier(0.2, 0.72, 0.25, 1) forwards;
+}
+
+.page-turn img {
+    backface-visibility: hidden;
+    box-shadow: inset 0 0 18px rgb(0 0 0 / 8%);
+}
+
+.page-turn .turn-back {
+    transform: rotateY(180deg);
+}
+
+.page-turn-control {
+    position: absolute;
+    top: 0;
+    z-index: 3;
+    width: 10%;
+    height: 100%;
+    border: 0;
+    color: #000;
+    font: inherit;
+    font-size: clamp(28px, 4vw, 40px);
+    opacity: 0.35;
+    transition: opacity 0.2s, background 0.2s;
+}
+
+.page-turn-control:hover,
+.page-turn-control:focus-visible {
+    opacity: 1;
+}
+
+.page-turn-control:disabled {
+    visibility: hidden;
+}
+
+.page-turn-previous {
+    left: 0;
+    background: linear-gradient(90deg, rgb(255 255 255 / 55%), transparent);
+}
+
+.page-turn-next {
+    right: 0;
+    background: linear-gradient(270deg, rgb(255 255 255 / 55%), transparent);
+}
+
+.page-count {
+    position: absolute;
+    right: 0;
+    bottom: 8px;
+    left: 0;
+    z-index: 3;
+    color: #333;
+    font: 12px/1.2 Helvetica, sans-serif;
+    text-align: center;
+    pointer-events: none;
+    text-shadow: 0 1px 2px #fff;
+}
+
+@keyframes turn-next {
+    to {
+        transform: rotateY(-180deg);
+    }
+}
+
+@keyframes turn-previous {
+    to {
+        transform: rotateY(180deg);
+    }
+}
+
+.viewer-copy {
+    max-height: 82vh;
+    overflow-y: auto;
+    font-size: clamp(16px, 1.5vw, 22px);
+    line-height: 1.4;
+}
+
+.viewer-copy h2 {
+    margin-bottom: 12px;
+    font-size: clamp(24px, 3vw, 40px);
+    font-weight: normal;
+    line-height: 1.1;
+}
+
+.viewer-meta {
+    margin-bottom: 28px;
+    font-size: 14px;
+}
+
+.viewer-description {
+    max-width: 32rem;
+    white-space: pre-line;
+}
+
+@keyframes appear {
+    from {
+        opacity: 0;
+        transform: scale(0.96);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* CLOSE BUTTON */
+
+.close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 12px;
+    color: #000;
+    cursor: url("cookie-cursor.svg") 4 4, pointer;
+}
+
+/* MOBILE */
+
+@media (max-width: 650px) {
+    .projects {
+        gap: 18px;
+        padding: 110px 5% 40px;
+    }
+
+    .project {
+        grid-template-columns: 30% 50% 20%;
+        font-size: 12px;
+        line-height: 21px;
+    }
+
+    .location {
+        display: none;
+    }
+
+    .project-spacer {
+        display: none;
+    }
+
+    .first-project .project-workshop {
+        grid-column: 2;
+    }
+
+    .first-project .project-year {
+        grid-column: 3;
+    }
+
+    #image-viewer {
+        padding: 64px 6vw 28px;
+    }
+
+    .viewer-content {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        max-height: calc(100vh - 100px);
+        overflow-y: auto;
+    }
+
+    .viewer-copy {
+        max-height: none;
+        overflow-y: visible;
+    }
+
+    #preview {
+        max-height: 45vh;
+    }
+
+    .preview-link {
+        max-height: 45vh;
+    }
+
+    .flipbook {
+        width: min(100%, 53vh);
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+
+<header class="header">
+    <a href="info.html">catarinanaoko.com</a>
+    <button class="info-toggle" type="button" aria-expanded="false" aria-controls="info-panel">info</button>
+</header>
+
+<aside class="info-panel" id="info-panel" aria-hidden="true">
+    catarina naoko
+    In a lucky draw, Catarina Naoko is interested in the moment of breaking a fortune cookie - the anticipation and the message, the intimacy of two fingers and a prophecy.
+    Taking vulnerability at its core, her works combines narrative with graphic, editorial, and digital design. 
+
+Much like a fortune cookie - it is a nod to the magic of everyday life, showing how even a simple phrase can connect people.
+    
+     · <a href="mailto:naokomontez@gmail.com">naokomontez@gmail.com</a> ·
+    <a href="https://instagram.com/catarinanaoko">instagram.com/catarinanaoko</a>
+</aside>
+
+
+<!-- PROJECT LIST -->
+
+<main class="projects">
+
+    <div class="project first-project">
+        <span class="project-name"
+        data-image="images/on last conversations final.pdf"
+        data-page-prefix="images/on-last-conversations-pages/page-"
+        data-page-count="48"
+        data-description="do you miss a childhood friend?&#10;still remember the lingering touch of an ex-lover?&#10;&#10;On Last Conversations is a publication derived from a creative writing workshop, exploring the decay of intimacy through  collective wring prompts.&#10;&#10;By creating a space of sharing vunerability,&#10;it attempts to immortalize traces of what once was and no longer is.&#10;This work is inherently about connection -&#10;how to find the right words through collectivity, and therefore, literature.">On Last Conversations</span>
+        <span class="project-spacer" aria-hidden="true"></span>
+        <span class="project-info project-workshop">Workshop</span>
+        <span class="project-year">2026</span>
+    </div>
+
+    <div class="project">
+      <span class="project-name"
+        data-image="images/mirepoix new.pdf"
+        data-page-prefix="images/mirepoix-new-pages/page-"
+        data-page-count="28"
+        data-description="from the bistro’s table is a triptych of three short stories that explores the relationship between two sisters after their dad’s passing, and inheriting his bistro restaurant.&#10;&#10;It is a celebration on how food has the power of bringing people together and an exercise of different perspectives over the same event.&#10;&#10;The short story “RECKONING” was featured in Spanish publishing house La Pera Ediciones’ 26R1 publication">From the Bistro's Table</span>
+        <span class="project-spacer" aria-hidden="true"></span>
+        <span class="project-info project-workshop">Publication</span>
+        <span class="project-year">2024</span>
+    </div>
+
+    <div class="project">
+      <span class="project-name"
+        data-image="images/uo-2.gif"
+        data-link="https://youtu.be/oQcUAKGjOIs"
+        data-description="This Somewhat Terrifying  Thing Called Passion is a mixed-media short film that speculates about the Brazilian Carnaval in 50 years from now.&#10;&#10;Set in a São Paulo city plagued by an everlasting heat and pollution wave, which forces people to wear masks during an event that relies on physical closeness.&#10;&#10;It is a warning of a climate crisis which grows at an exponential rate, as it is a love letter to Brazilian culture - the endurance of celebration even through tough times; the Brazilian way of “Gambiarra”, the act of creating an improvised solution; the feeling of &quot;Saudades”, a state of longing for a person, place, or thing that is absent.&#10;&#10;It is a study in language, joy, community and heritage in a different world. Mouth to mouth, breath to breath.">This Somewhat Terrifying<br><br>Thing Called Passion</span>
+        <span class="project-spacer" aria-hidden="true"></span>
+        <span class="project-info project-workshop">Video</span>
+        <span class="project-year">2026</span>
+    </div>
+
+    <div class="project">
+        <span class="project-name"
+        data-image="images/as i am leaving compact-2.pdf"
+        data-page-prefix="images/as-i-am-leaving-pages/page-"
+        data-page-count="36"
+        data-description="“Memory is achingly the only relation we can have with the dead”&#10;&#10;— Susan Sontag&#10;&#10;A comic book around grief.&#10;&#10;Divided into four short stories:&#10;&#10;“Pluto Retrogade”, “Table by the Door”,&#10;“Democracia Corinthiana” and&#10;“As I am Leaving”.&#10;&#10;Each representing a different facet of grief -&#10;from political to personal. Last year I lost my grandma, who I didn’t see for a year before her passing.&#10;&#10;This book is about her, as it is about me, and about you. It’s the loss - of people, of a different time, of a different life - that acts deeply in our human nature.">As I Am Leaving</span>
+        <span class="project-spacer" aria-hidden="true"></span>
+        <span class="project-info">Illustration</span>
+        <span class="project-year">2026</span>
+    </div>
+
+    <div class="project">
+        <span class="project-name"
+        data-image="images/peanut-2.gif"
+        data-centered-preview="true"
+        data-description="Developed in a day, “Fortunately, peanut butter” is a playful idiom generator that aims to strengthen a language barrier.&#10;&#10;Coded with HTML and JavaScript.&#10;&#10;It’s for the moments when your Dutch friend looks at you and says:&#10;“helaas, pindakaas” (unfortunately, peanut butter) and you want to be prepared with a hard-hitting idiom to answer with.&#10;&#10;A list of the most popular and funniest Dutch idioms was curated by the team. Each main word of the idiom was then ranked by the team from less nonsensical to more nonsensical.&#10;&#10;The goal of the machine is to confuse your peers.&#10;&#10;A collaboration with Le Phan-Nguyen, Floor Masrman and Mathias Woldstad">Unfortunately, Peanut Butter</span>
+        <span class="project-spacer" aria-hidden="true"></span>
+        <span class="project-info">Coding</span>
+        <span class="project-year">2026</span>
+    </div>
+
+    <div class="project">
+        <span class="project-name"
+        data-image="images/reino.gif"
+        data-link="https://youtu.be/hbelox-lobc"
+        data-centered-preview="true"
+        data-description="VOLUNTARY WORK is a two-part study case of the Brazilian Neo-Pentecostal Reino Church,&#10;consisting of a short documentary and an interactive visual novel.&#10;&#10;The documentary interconnects the Church with modern day trends, lifestyle brands,&#10;whilst problematizing its elitism and conformity.&#10;&#10;The visual novel, coded with HTML and&#10;JavaScript, serves as an immersion into this world.&#10;As the player experiences the game through the point of view of a young adult that decides to change their identity and join Reino.">Voluntary Work</span>
+        <span class="project-spacer" aria-hidden="true"></span>
+        <span class="project-info">Video</span>
+        <span class="project-year">2026</span>
+    </div>
+
+    <div class="project">
+        <span class="project-name"
+        data-image="images/wood.png"
+        data-description="Handmade wood stool. Made in colaboration with Madinah Tuharea">Wood Stool</span>
+        <span class="project-spacer" aria-hidden="true"></span>
+        <span class="project-info">Wood</span>
+        <span class="project-year">2025</span>
+    </div>
+
+    <div class="project">
+        <span class="project-name"
+        data-page="photography.html">Photography Portfolio</span>
+                <span class="project-spacer" aria-hidden="true"></span>
+        <span class="project-info">Photography</span>
+        <span class="project-year">2026</span>
+    </div>
+
+</main>
+
+
+<!-- PINK IMAGE SCREEN -->
+
+<div id="image-viewer">
+
+    <span class="close">CLOSE ×</span>
+
+    <div class="viewer-content">
+        <a id="preview-link" class="preview-link" hidden>
+            <img id="preview" src="" alt="Project image">
+        </a>
+        <div class="flipbook" id="flipbook" aria-label="On Last Conversations flipbook" hidden>
+            <img class="flipbook-page" id="current-page" src="" alt="" draggable="false">
+            <div class="page-turn" id="page-turn" aria-hidden="true" hidden>
+                <img class="turn-front" id="turn-front" src="" alt="" draggable="false">
+                <img class="turn-back" id="turn-back" src="" alt="" draggable="false">
+            </div>
+            <button class="page-turn-control page-turn-previous" id="previous-page" type="button" aria-label="Previous page" disabled>‹</button>
+            <button class="page-turn-control page-turn-next" id="next-page" type="button" aria-label="Next page">›</button>
+            <span class="page-count" id="page-count" aria-live="polite"></span>
+        </div>
+        <div class="viewer-copy">
+            <h2 id="description-title"></h2>
+            <p class="viewer-meta" id="description-meta"></p>
+            <p class="viewer-description"></p>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- JAVASCRIPT -->
+
+<script>
+
+const viewer = document.getElementById("image-viewer");
+const viewerContent = document.querySelector(".viewer-content");
+const previewLink = document.getElementById("preview-link");
+const preview = document.getElementById("preview");
+const flipbook = document.getElementById("flipbook");
+const currentPageImage = document.getElementById("current-page");
+const pageTurn = document.getElementById("page-turn");
+const turnFront = document.getElementById("turn-front");
+const turnBack = document.getElementById("turn-back");
+const pageCountLabel = document.getElementById("page-count");
+const previousPageButton = document.getElementById("previous-page");
+const nextPageButton = document.getElementById("next-page");
+const descriptionTitle = document.getElementById("description-title");
+const descriptionMeta = document.getElementById("description-meta");
+const description = document.querySelector(".viewer-description");
+const closeButton = document.querySelector(".close");
+let pageCount = 0;
+let currentPageIndex = 0;
+let isTurningPage = false;
+let turnTargetIndex = 0;
+
+function getPageUrl(index) {
+    return `${flipbook.dataset.pagePrefix}${String(index + 1).padStart(3, "0")}.jpg`;
+}
+
+function updatePageControls() {
+    pageCountLabel.textContent = `${currentPageIndex + 1} / ${pageCount}`;
+    previousPageButton.disabled = isTurningPage || currentPageIndex === 0;
+    nextPageButton.disabled = isTurningPage || currentPageIndex === pageCount - 1;
+}
+
+function preloadPage(index) {
+    if (index < 0 || index >= pageCount) {
+        return;
+    }
+
+    const image = new Image();
+    image.src = getPageUrl(index);
+}
+
+function openFlipbook(projectName) {
+    pageCount = Number(projectName.dataset.pageCount);
+    flipbook.dataset.pagePrefix = projectName.dataset.pagePrefix;
+    flipbook.dataset.projectTitle = projectName.textContent.trim();
+    flipbook.setAttribute("aria-label", `${flipbook.dataset.projectTitle} flipbook`);
+    currentPageIndex = 0;
+    isTurningPage = false;
+    pageTurn.className = "page-turn";
+    pageTurn.hidden = true;
+    currentPageImage.src = getPageUrl(currentPageIndex);
+    currentPageImage.alt = `${flipbook.dataset.projectTitle} page ${currentPageIndex + 1}`;
+    updatePageControls();
+    preloadPage(currentPageIndex + 1);
+}
+
+function turnPage(direction) {
+    if (isTurningPage || flipbook.hidden) {
+        return;
+    }
+
+    turnTargetIndex = currentPageIndex + direction;
+    if (turnTargetIndex < 0 || turnTargetIndex >= pageCount) {
+        return;
+    }
+
+    isTurningPage = true;
+    pageTurn.className = `page-turn ${direction > 0 ? "turn-next" : "turn-previous"}`;
+    turnFront.src = getPageUrl(currentPageIndex);
+    turnBack.src = getPageUrl(turnTargetIndex);
+    currentPageImage.src = getPageUrl(turnTargetIndex);
+    currentPageImage.alt = `${flipbook.dataset.projectTitle} page ${turnTargetIndex + 1}`;
+    pageTurn.hidden = false;
+    updatePageControls();
+    preloadPage(turnTargetIndex + direction);
+}
+
+pageTurn.addEventListener("animationend", (event) => {
+    if (event.target !== pageTurn) {
+        return;
+    }
+
+    currentPageIndex = turnTargetIndex;
+    isTurningPage = false;
+    pageTurn.hidden = true;
+    pageTurn.className = "page-turn";
+    updatePageControls();
+});
+
+// OPEN PROJECT
+
+document.querySelectorAll(".project-name, .project-info")
+.forEach(item => {
+
+    item.addEventListener("click", () => {
+
+        const project = item.closest(".project");
+
+        const image = project.querySelector(".project-name")
+            .dataset.image;
+        const projectName = project.querySelector(".project-name");
+
+        if (projectName.dataset.page) {
+            window.location.href = projectName.dataset.page;
+            return;
+        }
+        const metadata = [...project.children]
+            .filter(element => element !== projectName && element.textContent.trim())
+            .map(element => element.textContent.trim())
+            .join(" · ");
+
+        const isPdf = image.toLowerCase().endsWith(".pdf");
+        viewerContent.classList.toggle(
+            "centered-preview",
+            Boolean(projectName.dataset.link || projectName.dataset.centeredPreview === "true")
+        );
+        previewLink.hidden = isPdf;
+        flipbook.hidden = !isPdf;
+
+        if (projectName.dataset.link) {
+            previewLink.href = projectName.dataset.link;
+            previewLink.setAttribute("aria-label", `Open ${projectName.textContent.trim()} on YouTube`);
+        } else {
+            previewLink.removeAttribute("href");
+            previewLink.removeAttribute("aria-label");
+        }
+
+        if (isPdf) {
+            openFlipbook(projectName);
+        } else {
+            preview.src = image;
+        }
+
+        descriptionTitle.textContent = projectName.textContent.trim();
+        descriptionMeta.textContent = metadata;
+        description.textContent = projectName.dataset.description || "";
+
+        viewer.classList.add("active");
+
+    });
+
+});
+
+// CLOSE PROJECT
+
+function closeViewer() {
+
+    viewer.classList.remove("active");
+    viewerContent.classList.remove("centered-preview");
+
+    preview.src = "";
+    previewLink.removeAttribute("href");
+    previewLink.removeAttribute("aria-label");
+    previewLink.hidden = true;
+    currentPageImage.src = "";
+    turnFront.src = "";
+    turnBack.src = "";
+    flipbook.hidden = true;
+    pageTurn.hidden = true;
+    pageTurn.className = "page-turn";
+    isTurningPage = false;
+
+}
+
+previousPageButton.addEventListener("click", () => turnPage(-1));
+nextPageButton.addEventListener("click", () => turnPage(1));
+
+closeButton.addEventListener("click", closeViewer);
+
+viewer.addEventListener("click", (event) => {
+
+    if (event.target === viewer) {
+        closeViewer();
+    }
+
+});
+
+// ESCAPE KEY
+
+document.addEventListener("keydown", (event) => {
+
+    if (event.key === "Escape") {
+        closeViewer();
+    } else if (flipbook.hidden === false && event.key === "ArrowRight") {
+        event.preventDefault();
+        turnPage(1);
+    } else if (flipbook.hidden === false && event.key === "ArrowLeft") {
+        event.preventDefault();
+        turnPage(-1);
+    }
+
+});
+
+const infoToggle = document.querySelector(".info-toggle");
+const infoPanel = document.getElementById("info-panel");
+
+function setInfoPanelOpen(isOpen) {
+    infoPanel.classList.toggle("open", isOpen);
+    infoToggle.setAttribute("aria-expanded", String(isOpen));
+    infoPanel.setAttribute("aria-hidden", String(!isOpen));
+}
+
+infoToggle.addEventListener("click", () => {
+    setInfoPanelOpen(infoToggle.getAttribute("aria-expanded") !== "true");
+});
+
+document.addEventListener("click", (event) => {
+    if (!infoPanel.contains(event.target) && !infoToggle.contains(event.target)) {
+        setInfoPanelOpen(false);
+    }
+});
+
+document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+        setInfoPanelOpen(false);
+    }
+});
+
+</script>
+
+</body>
+</html>

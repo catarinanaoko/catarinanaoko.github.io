@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Photography Portfolio — Catarina Naoko</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      cursor: url("cookie-cursor.svg") 4 4, auto;
+    }
+
+    body {
+      min-height: 100vh;
+      background: #FFDFE9;
+      color: #000;
+      font-family: Times New Roman, Helvetica, sans-serif;
+    }
+
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 18px 16px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 17px;
+      z-index: 10;
+    }
+
+    .header a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .page {
+      display: flex;
+      align-items: center;
+      min-height: 100vh;
+      padding: 72px 0 24px;
+    }
+
+    .gallery {
+      overflow: hidden;
+      width: 100%;
+    }
+
+    .gallery-track {
+      display: flex;
+      width: max-content;
+      animation: scroll-gallery 50s linear infinite;
+    }
+
+    .gallery-set {
+      display: flex;
+      flex: none;
+      align-items: center;
+      gap: 28px;
+      padding-right: 28px;
+    }
+
+    .gallery:hover .gallery-track,
+    .gallery:focus-within .gallery-track {
+      animation-play-state: paused;
+    }
+
+    .gallery img {
+      display: block;
+      width: auto;
+      height: min(76vh, 760px);
+      object-fit: contain;
+    }
+
+    @keyframes scroll-gallery {
+      to {
+        transform: translateX(-50%);
+      }
+    }
+
+    @media (max-width: 650px) {
+      .page {
+        padding: 70px 0 24px;
+      }
+
+      .gallery-set {
+        gap: 16px;
+        padding-right: 16px;
+      }
+
+      .gallery img {
+        height: 68vh;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .gallery {
+        overflow-x: auto;
+      }
+
+      .gallery-track {
+        animation: none;
+      }
+
+      .gallery-set[aria-hidden="true"] {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <a href="index.html">catarinanaoko.com</a>
+    <a href="index.html">close ×</a>
+  </header>
+
+  <main class="page">
+    <div class="gallery" aria-label="Photography portfolio" tabindex="0">
+      <div class="gallery-track">
+        <div class="gallery-set">
+          <img src="images/photography/000079230013.jpg" alt="Photography portfolio image" />
+          <img src="images/photography/IMG_1224.jpg" alt="Photography portfolio image" />
+          <img src="images/photography/IMG_1230.jpg" alt="Photography portfolio image" />
+          <img src="images/photography/IMG_1240.jpg" alt="Photography portfolio image" />
+          <img src="images/photography/IMG_1247.jpg" alt="Photography portfolio image" />
+          <img src="images/photography/IMG_1565.jpg" alt="Photography portfolio image" />
+          <img src="images/photography/R1-06665-0007.jpg" alt="Photography portfolio image" />
+          <img src="images/photography/img011.jpg" alt="Photography portfolio image" />
+          <img src="images/photography/img016.jpg" alt="Photography portfolio image" />
+        </div>
+        <div class="gallery-set" aria-hidden="true">
+          <img src="images/photography/000079230013.jpg" alt="" />
+          <img src="images/photography/IMG_1224.jpg" alt="" />
+          <img src="images/photography/IMG_1230.jpg" alt="" />
+          <img src="images/photography/IMG_1240.jpg" alt="" />
+          <img src="images/photography/IMG_1247.jpg" alt="" />
+          <img src="images/photography/IMG_1565.jpg" alt="" />
+          <img src="images/photography/R1-06665-0007.jpg" alt="" />
+          <img src="images/photography/img011.jpg" alt="" />
+          <img src="images/photography/img016.jpg" alt="" />
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
